@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Classement des joueurs</title>
+<style>
+:root{
+  --bg:#f5f6fa;--card:#fff;--text:#1c1e26;--muted:#6b7080;--border:#e2e5ee;--accent:#4f46e5;--accent-text:#fff;
+  --ra:#16a34a;--rb:#65a30d;--rc:#ca8a04;--rd:#ea580c;--re:#dc2626;
+  box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#14151b;--card:#1e2029;--text:#eceef5;--muted:#9aa0b4;--border:#2d303d;--accent:#818cf8;--accent-text:#14151b;
+    --ra:#4ade80;--rb:#a3e635;--rc:#facc15;--rd:#fb923c;--re:#f87171;color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#14151b;--card:#1e2029;--text:#eceef5;--muted:#9aa0b4;--border:#2d303d;--accent:#818cf8;--accent-text:#14151b;
+  --ra:#4ade80;--rb:#a3e635;--rc:#facc15;--rd:#fb923c;--re:#f87171;color-scheme:dark;
+}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;line-height:1.4}
+main{max-width:640px;margin:0 auto;padding:20px 16px 40px}
+h1{font-size:1.6rem;margin:0 0 4px}
+.sub{color:var(--muted);margin:0 0 18px;font-size:.95rem}
+.card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:14px}
+form{display:flex;gap:8px;flex-wrap:wrap}
+input,select,button{font:inherit;color:var(--text);background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:10px 12px}
+input[type=text]{flex:1 1 160px;min-width:0}
+button{cursor:pointer}
+button.primary{background:var(--accent);color:var(--accent-text);border-color:var(--accent);font-weight:600}
+.tools{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0}
+.tools input{flex:1 1 140px}
+.chips{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
+.chip{padding:6px 12px;border-radius:999px;font-size:.9rem}
+.chip.on{background:var(--accent);color:var(--accent-text);border-color:var(--accent)}
+.sec{margin-bottom:14px}
+.sec h2{display:flex;align-items:center;gap:10px;font-size:1.05rem;margin:0 0 8px}
+.badge{display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:9px;font-weight:800;color:#fff;font-size:1.1rem}
+.badge.A{background:var(--ra)}.badge.B{background:var(--rb)}.badge.C{background:var(--rc)}.badge.D{background:var(--rd)}.badge.E{background:var(--re)}
+.badge.A,.badge.B,.badge.C{color:#10120a}
+.count{color:var(--muted);font-weight:400;font-size:.9rem}
+.row{display:flex;align-items:center;gap:8px;padding:8px 0;border-top:1px solid var(--border)}
+.row:first-of-type{border-top:0}
+.name{flex:1;min-width:0;overflow-wrap:anywhere;font-weight:500}
+.row select{padding:6px 8px}
+.row button{padding:6px 10px}
+.empty{color:var(--muted);font-size:.9rem;padding:4px 0}
+.none{text-align:center;color:var(--muted);padding:24px 0}
+.foot{display:flex;justify-content:space-between;align-items:center;margin-top:8px;color:var(--muted);font-size:.85rem}
+.link{background:none;border:0;color:var(--muted);text-decoration:underline;padding:4px}
+@keyframes rise{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+@keyframes pop{0%{opacity:0;transform:scale(.85);background:color-mix(in srgb,var(--accent) 30%,transparent)}60%{opacity:1;transform:scale(1.04)}100%{opacity:1;transform:none;background:transparent}}
+@keyframes out{to{opacity:0;transform:translateX(40px)}}
+@keyframes wiggle{0%,60%,100%{transform:rotate(0)}70%{transform:rotate(-14deg) scale(1.1)}80%{transform:rotate(12deg) scale(1.1)}90%{transform:rotate(-6deg)}}
+.trophy{display:inline-block;transform-origin:50% 80%;animation:wiggle 3s ease-in-out infinite}
+.sec.in{animation:rise .5s ease both}
+.row.pop{animation:pop .6s ease both}
+.row.out{animation:out .25s ease forwards}
+.row{transition:background .2s}
+.row:hover{background:color-mix(in srgb,var(--accent) 7%,transparent)}
+.badge{transition:transform .25s cubic-bezier(.34,1.56,.64,1)}
+.sec:hover .badge{transform:scale(1.12) rotate(-5deg)}
+button{transition:transform .15s,background .2s,opacity .2s,box-shadow .2s}
+button:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 4px 10px rgba(0,0,0,.15)}
+button:active:not(:disabled){transform:scale(.93)}
+button:disabled{opacity:.35;cursor:default}
+input,select{transition:border-color .2s,box-shadow .2s}
+input:focus,select:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 25%,transparent)}
+.none{animation:rise .5s ease both}
+.tabs{display:flex;gap:6px;margin:14px 0 12px;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:4px}
+.tab{flex:1;border:0;background:transparent;font-weight:600;color:var(--muted)}
+.tab.on{background:var(--accent);color:var(--accent-text)}
+.pos{width:38px;flex:none;text-align:center;font-weight:800;font-size:1.05rem;color:var(--muted)}
+.pos.medal{font-size:1.6rem}
+.row .badge{width:30px;height:30px;font-size:.95rem;flex:none}
+.row.top{background:color-mix(in srgb,#facc15 13%,transparent);border-radius:10px}
+.search{position:relative;flex:1 1 100%;display:flex;align-items:center}
+.search input{width:100%;padding:13px 42px;font-size:1rem;border-radius:12px;-webkit-appearance:none;appearance:none}
+.search input::-webkit-search-cancel-button{display:none}
+.mag{position:absolute;left:14px;pointer-events:none}
+.clr{position:absolute;right:6px;border:0;background:transparent;padding:6px 10px}
+.clr:hover:not(:disabled){box-shadow:none}
+.modes{display:flex;gap:6px;flex-wrap:wrap;margin:0 0 14px}
+.mode{flex:1 1 auto;font-weight:700}
+.mode.on{background:var(--accent);color:var(--accent-text);border-color:var(--accent)}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<main>
+  <h1><span class="trophy">🏆</span> Classement des joueurs</h1>
+  <p class="sub">Rangs du plus fort au plus faible : A, B, C, D, E.</p>
+  <div class="modes" id="modes"></div>
+
+  <div class="card">
+    <form id="f">
+      <input type="text" id="name" placeholder="Nom du joueur" maxlength="40" required autocomplete="off">
+      <select id="rank" aria-label="Rang">
+        <option>A</option><option>B</option><option selected>C</option><option>D</option><option>E</option>
+      </select>
+      <select id="mode" aria-label="Mode"></select>
+      <button class="primary" type="submit">Ajouter</button>
+    </form>
+  </div>
+
+  <div class="tools">
+    <div class="search"><span class="mag">🔍</span><input type="search" id="q" placeholder="Rechercher un nom…" autocomplete="off"><button type="button" id="clr" class="clr" title="Effacer" hidden>✕</button></div>
+  </div>
+  <div class="tabs" id="tabs"></div>
+  <div class="chips" id="chips"></div>
+  <div id="list"></div>
+  <div class="foot"><span id="total"></span><button class="link" id="reset" type="button">Tout effacer</button></div>
+</main>
+
+<script>
+(function(){
+  var RANKS=["A","B","C","D","E"], KEY="classement-joueurs";
+  var players=[], filter="Tous", pop=null, first=true, view="general", mode="diamond",
+      MODES=[["diamond","💎 Diamond SMP"],["uhc","🍎 UHC"],["crystal","🔮 Crystal"]];
+
+  function load(){
+    try{var s=localStorage.getItem(KEY);if(s){var d=JSON.parse(s);if(Array.isArray(d))players=d;}}catch(e){}
+  }
+  function save(){try{localStorage.setItem(KEY,JSON.stringify(players));}catch(e){}}
+  function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,6);}
+
+  function el(tag,cls,txt){var e=document.createElement(tag);if(cls)e.className=cls;if(txt!==undefined)e.textContent=txt;return e;}
+
+  function renderChips(){
+    var box=document.getElementById("chips");box.innerHTML="";
+    ["Tous"].concat(RANKS).forEach(function(r){
+      var b=el("button","chip"+(filter===r?" on":""),r);
+      b.type="button";
+      b.onclick=function(){filter=r;render();};
+      box.appendChild(b);
+    });
+  }
+
+  function render(){
+    renderChips();
+    var q=document.getElementById("q").value.trim().toLowerCase();
+    var list=document.getElementById("list");list.innerHTML="";
+    var shown=0;
+    renderTabs();
+    if(view==="general"){renderGeneral(q,list);return;}
+    RANKS.forEach(function(r){
+      if(filter!=="Tous"&&filter!==r)return;
+      var items=cur().filter(function(p){return p.rank===r&&p.name.toLowerCase().indexOf(q)!==-1;})
+        .sort(function(a,b){return a.name.localeCompare(b.name,"fr");});
+      shown+=items.length;
+      if(!items.length&&(q||filter==="Tous"&&false))return;
+      var sec=el("div","card sec"+(first?" in":""));
+      if(first)sec.style.animationDelay=(RANKS.indexOf(r)*80)+"ms";
+      var h=el("h2");
+      h.appendChild(el("span","badge "+r,r));
+      h.appendChild(document.createTextNode("Rang "+r+" "));
+      h.appendChild(el("span","count","("+items.length+")"));
+      sec.appendChild(h);
+      if(!items.length)sec.appendChild(el("div","empty","Aucun joueur dans ce rang."));
+      items.forEach(function(p){
+        var row=el("div","row"+(p.id===pop?" pop":""));
+        row.appendChild(el("span","name",p.name));
+        var up=el("button",null,"▲");up.type="button";up.title="Monter d’un rang";
+        up.disabled=RANKS.indexOf(p.rank)===0;
+        up.onclick=function(){move(p.id,-1);};
+        var dn=el("button",null,"▼");dn.type="button";dn.title="Descendre d’un rang";
+        dn.disabled=RANKS.indexOf(p.rank)===RANKS.length-1;
+        dn.onclick=function(){move(p.id,1);};
+        var del=el("button",null,"✕");del.type="button";del.title="Supprimer";
+        del.onclick=function(){row.classList.add("out");setTimeout(function(){players=players.filter(function(x){return x.id!==p.id;});save();render();},250);};
+        row.appendChild(up);row.appendChild(dn);row.appendChild(del);
+        sec.appendChild(row);
+      });
+      list.appendChild(sec);
+    });
+    if(!shown&&(q||!cur().length)){
+      list.innerHTML="";
+      list.appendChild(el("div","none",cur().length?"Aucun résultat.":"Aucun joueur pour l’instant. Ajoutez-en un ci-dessus !"));
+    }
+    document.getElementById("total").textContent=players.length+" joueur"+(players.length>1?"s":"")+" au total";
+    first=false;pop=null;
+  }
+
+  function cur(){return players.filter(function(p){return p.mode===mode;});}
+
+  function renderModes(){
+    var box=document.getElementById("modes");box.innerHTML="";
+    MODES.forEach(function(m){
+      var n=players.filter(function(p){return p.mode===m[0];}).length;
+      var b=el("button","mode"+(mode===m[0]?" on":""),m[1]+" ("+n+")");b.type="button";
+      b.onclick=function(){mode=m[0];first=true;render();};
+      box.appendChild(b);
+    });
+    var s=document.getElementById("mode");if(s&&s.value!==mode)s.value=mode;
+  }
+
+  function renderTabs(){
+    renderModes();
+    var box=document.getElementById("tabs");box.innerHTML="";
+    [["general","🏅 Classement général"],["rangs","Par rang"]].forEach(function(t){
+      var b=el("button","tab"+(view===t[0]?" on":""),t[1]);b.type="button";
+      b.onclick=function(){view=t[0];first=true;render();};
+      box.appendChild(b);
+    });
+  }
+
+  function renderGeneral(q,list){
+    var all=players.filter(function(p){return p.mode===mode;}).sort(function(a,b){return RANKS.indexOf(a.rank)-RANKS.indexOf(b.rank)||a.name.localeCompare(b.name,"fr");});
+    var items=all.map(function(p,i){return {p:p,pos:i+1};}).filter(function(o){
+      return (filter==="Tous"||o.p.rank===filter)&&o.p.name.toLowerCase().indexOf(q)!==-1;
+    });
+    if(!items.length){
+      list.appendChild(el("div","none",all.length?"Aucun résultat.":"Aucun joueur pour l’instant. Ajoutez-en un ci-dessus !"));
+    }else{
+      var card=el("div","card sec"+(first?" in":""));
+      items.forEach(function(o){
+        var p=o.p;
+        var row=el("div","row"+(o.pos<=3?" top":"")+(p.id===pop?" pop":""));
+        row.appendChild(el("span","pos"+(o.pos<=3?" medal":""),o.pos===1?"🥇":o.pos===2?"🥈":o.pos===3?"🥉":String(o.pos)));
+        row.appendChild(el("span","name",p.name));
+        row.appendChild(el("span","badge "+p.rank,p.rank));
+        var up=el("button",null,"▲");up.type="button";up.title="Monter d’un rang";
+        up.disabled=RANKS.indexOf(p.rank)===0;
+        up.onclick=function(){move(p.id,-1);};
+        var dn=el("button",null,"▼");dn.type="button";dn.title="Descendre d’un rang";
+        dn.disabled=RANKS.indexOf(p.rank)===RANKS.length-1;
+        dn.onclick=function(){move(p.id,1);};
+        var del=el("button",null,"✕");del.type="button";del.title="Supprimer";
+        del.onclick=function(){row.classList.add("out");setTimeout(function(){players=players.filter(function(x){return x.id!==p.id;});save();render();},250);};
+        row.appendChild(up);row.appendChild(dn);row.appendChild(del);
+        card.appendChild(row);
+      });
+      list.appendChild(card);
+    }
+    document.getElementById("total").textContent=players.length+" joueur"+(players.length>1?"s":"")+" au total";
+    first=false;pop=null;
+  }
+
+  function move(id,d){
+    players.forEach(function(p){
+      if(p.id===id){var i=RANKS.indexOf(p.rank)+d;if(i>=0&&i<RANKS.length){p.rank=RANKS[i];pop=id;}}
+    });
+    save();render();
+  }
+
+  document.getElementById("f").addEventListener("submit",function(e){
+    e.preventDefault();
+    var n=document.getElementById("name"),name=n.value.trim();
+    if(!name)return;
+    var np={id:uid(),name:name,rank:document.getElementById("rank").value,mode:document.getElementById("mode").value};
+    players.push(np);pop=np.id;mode=np.mode;
+    n.value="";n.focus();save();render();
+  });
+  var qi=document.getElementById("q"),clr=document.getElementById("clr");
+  qi.addEventListener("input",function(){clr.hidden=!qi.value;render();});
+  clr.addEventListener("click",function(){qi.value="";clr.hidden=true;qi.focus();render();});
+  document.getElementById("reset").addEventListener("click",function(){
+    if(players.length&&confirm("Supprimer tous les joueurs ?")){players=[];save();render();}
+  });
+
+  load();
+  players.forEach(function(p){if(!p.mode)p.mode="diamond";});
+  var ms=document.getElementById("mode");
+  MODES.forEach(function(m){var o=document.createElement("option");o.value=m[0];o.textContent=m[1];ms.appendChild(o);});
+  ms.value=mode;
+  ms.addEventListener("change",function(){mode=ms.value;first=true;render();});
+  render();
+})();
+</script>
+</body>
+</html>
